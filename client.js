@@ -155,7 +155,7 @@ client.on(Events.InteractionCreate, async interaction => {
             const message = await interaction.editReply(text);
 
             arrActivesTxs.message = message;
-            
+
             client.txMap.set(interaction.user.id, arrActivesTxs);
             console.log(arrActivesTxs);
         } catch(e) {
@@ -200,7 +200,7 @@ client.on(Events.InteractionCreate, async interaction => {
             }
             await interaction.deferReply();
             const hash = await withdrawalController.call(controllers, interaction);
-            await interaction.editReply(`WITHDRAWAL TX HASH: ${hash}`);
+            await interaction.editReply(`Sent: https://etherscan.io/tx/${hash}`);
         } catch(e) {
             console.error(`[ERROR] ${e}`);
             await interaction.editReply({ content: "There was an error while executing this command!", ephemeral: true });
