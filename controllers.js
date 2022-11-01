@@ -268,7 +268,7 @@ module.exports = {
 
         const nftMatrix = [];
         for (const addr in table) {
-            const tup = [addr, [table[addr]]];
+            const tup = [addr, table[addr]];
             nftMatrix.push(tup);
         }
 
@@ -278,12 +278,15 @@ module.exports = {
 
         const contractMethod = tokenContract.methods.getArrayNft(nftMatrix, nftContract, whereWithdrawal);
 
-        const nonce = await this.web3.eth.getTransactionCount(user["contract_address"]);
+        const nonce = await this.web3.eth.getTransactionCount(contractWallet["address"]);
+
+        console.log(contractWallet["address"]);
+
 
         const tx = {
             from: contractWallet["address"],
             gasLimit: this.web3.utils.toHex(gasLimit),
-            to: user["contract_address"],
+            to: user['contract_address'],
             value: "0x0",
             data: contractMethod.encodeABI(),
             maxFeePerGas: maxFeePerGas,
@@ -292,9 +295,10 @@ module.exports = {
             type: 2,
         }
 
-        console.log(tx);
+        const signTx = await this.web3.eth.accounts.signTransaction(tx, contractWallet['priv_key']);
 
-        const signTx = await this.web3.eth.signTransaction(tx, contractWallet["priv_key"]);
+        console.log(signTx);
+        console.log(signTx.transactionHash)
 
         this.web3.eth.sendSignedTransaction(signTx.rawTransaction)
                      .then( tx => console.log(`[INFO] WITHDRAWAL HASH: ${tx.transactionHash}`))
@@ -303,5 +307,3 @@ module.exports = {
         return signTx["transactionHash"];
     }
 }
-
-
