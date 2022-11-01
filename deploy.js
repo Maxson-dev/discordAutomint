@@ -1,11 +1,12 @@
 "use strict";
 require("dotenv").config();
+const util = require("util");
+const exec = util.promisify(require('child_process').exec);
 const fs = require("fs");
 const path = require("path");
 const { REST, Routes } = require("discord.js");
 const token = process.env.TOKEN;
 const appId = process.env.APP_ID;
-
 
 const rest = new REST({ version: "10" }).setToken(token);
 
@@ -21,6 +22,10 @@ for (const file of commandFiles) {
 
 (async () => {
     try {
+
+        //await exec("mkdir db");
+        //await exec("touch ./db/db.sqlite");
+
         console.log(`[INFO] STARTED LOADING ${commands.length} (/) COMMANDS`);
 
         const data = await rest.put(Routes.applicationCommands(appId), { body: commands });

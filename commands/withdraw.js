@@ -9,15 +9,15 @@ const {
 
 module.exports = {
     data: new SlashCommandBuilder()
-          .setName("mint")
-          .setDescription("minting nft"),
+          .setName("withdraw")
+          .setDescription("withdrawal request"),
 
     async execute(interaction) {
         const modal = new ModalBuilder()
-              .setCustomId("mintconfig")
-              .setTitle("Mint config");
+              .setCustomId("withdraw")
+              .setTitle("Withdrawal");
 
-        const txHash = new TextInputBuilder()
+        const hash = new TextInputBuilder()
               .setCustomId("hash")
               .setLabel("Txn hash")
               .setStyle(TextInputStyle.Short)
@@ -25,9 +25,15 @@ module.exports = {
               .setMinLength(66)
               .setMaxLength(66);
 
-        const txCount = new TextInputBuilder()
-              .setCustomId("numtx")
-              .setLabel("Number of tx")
+        const commonWallets = new TextInputBuilder()
+              .setCustomId("addr")
+              .setLabel("Withdrawal address")
+              .setStyle(TextInputStyle.Short)
+              .setRequired(true);
+
+        const gasLim = new TextInputBuilder()
+              .setCustomId("gaslim")
+              .setLabel("Gas Limit")
               .setStyle(TextInputStyle.Short)
               .setRequired(true);
 
@@ -43,12 +49,13 @@ module.exports = {
               .setStyle(TextInputStyle.Short)
               .setRequired(true);
 
-        const actionRow1 = new ActionRowBuilder().addComponents(txHash);
-        const actionRow2 = new ActionRowBuilder().addComponents(txCount);
+        const actionRow1 = new ActionRowBuilder().addComponents(hash);
+        const actionRow2 = new ActionRowBuilder().addComponents(commonWallets);
         const actionRow3 = new ActionRowBuilder().addComponents(maxGwei);
         const actionRow4 = new ActionRowBuilder().addComponents(minGwei);
+        const actionRow5 = new ActionRowBuilder().addComponents(gasLim);
 
-        modal.addComponents(actionRow1, actionRow2, actionRow3, actionRow4);
+        modal.addComponents(actionRow1, actionRow2, actionRow3, actionRow4, actionRow5);
 
         await interaction.showModal(modal);
     }

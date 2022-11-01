@@ -2,7 +2,7 @@
 const path = require("path");
 const fs = require("fs");
 const { Client, Events, GatewayIntentBits, Collection } = require("discord.js");
-const { mintController, web3, authController, addWalletController } = require("./controllers");
+const { mintController, web3, authController, addWalletController, withdrawalController } = require("./controllers");
 const { User, Wallet } = require("./models");
 const controllers = require("./controllers");
 
@@ -141,11 +141,21 @@ client.on(Events.InteractionCreate, async interaction => {
     case "mintconfig":
         try {
             console.log("START MINT");
+
+            if (client.txMap.has(interaction.user.id)) 
+                client.txMap.delete(interaction.user.id);
+
             await interaction.deferReply();
             const arrActivesTxs = await mintController.call(controllers, interaction);
-            const message = await interaction.editReply(arrActivesTxs.text);
+            const text = arrActivesTxs.text;
+
+            if (!text.length 
+             || !arrActivesTxs.length) throw new Error("FAILED TX");
+
+            const message = await interaction.editReply(text);
+
             arrActivesTxs.message = message;
-            console.log(arrActivesTxs.message);
+            
             client.txMap.set(interaction.user.id, arrActivesTxs);
             console.log(arrActivesTxs);
         } catch(e) {
@@ -179,6 +189,21 @@ client.on(Events.InteractionCreate, async interaction => {
         } catch(e) {
             console.error(`[ERROR] ${e}`);
             await interaction.reply({ content: "There was an error while executing this command!", ephemeral: true });
+        }
+        break;
+    case "withdraw":
+        try {
+            const user = User.findOne( { where: { discord_id: interaction.user.id } });
+            if (!user) {
+                await interaction.reply({ content: `You are not authorized!`, ephemeral: true });
+                return;
+            }
+            await interaction.deferReply();
+            const hash = await withdrawalController.call(controllers, interaction);
+            await interaction.editReply(`WITHDRAWAL TX HASH: ${hash}`);
+        } catch(e) {
+            console.error(`[ERROR] ${e}`);
+            await interaction.editReply({ content: "There was an error while executing this command!", ephemeral: true });
         }
         break;
     }
