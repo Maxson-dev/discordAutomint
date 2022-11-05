@@ -39,7 +39,7 @@ module.exports = {
         const amountPerTx = numTx;
         const txCount = 1;
         const mintPerCall = 1;
-        const payableMint = String(txInfo.value === 0 ? false : true);
+        const payableMint = String(parseInt(txInfo.value) === 0 ? false : true);
         const data = txInfo.input;
 
         const contractMethod = tokenContract.methods.mintWithLoop([
